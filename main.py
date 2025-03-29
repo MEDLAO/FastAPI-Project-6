@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
-from io import BytesIO
 import uuid
 import os
 
@@ -70,6 +69,11 @@ def delete_after_delay(path, delay=60):
     time.sleep(delay)
     if os.path.exists(path):
         os.remove(path)
+
+
+@app.get("/", response_class=FileResponse)
+def serve_index():
+    return FileResponse("index.html")
 
 
 # === Endpoint ===
@@ -168,20 +172,20 @@ async def apply_filter(uploaded_file: UploadFile = File(...), background_tasks: 
           font-size: 14px;
         }}
 
-        .download-btn {{
+        .btn {{
           font-family: 'DM Sans', sans-serif;
           font-weight: 600;
           background-color: #386BB8;
           color: white;
           border: none;
-          padding: 12px 40px;
-          font-size: 16px;
+          padding: 12px 28px;
+          font-size: 12px;
           border-radius: 4px;
           cursor: pointer;
           transition: background-color 0.3s ease;
         }}
 
-        .download-btn:hover {{
+        .btn:hover {{
           background-color: #1E4380;
         }}
       </style>
@@ -197,16 +201,21 @@ async def apply_filter(uploaded_file: UploadFile = File(...), background_tasks: 
       <p>Select a photo and download it with the official Tarjimly circular frame</p>
 
       <form>
-        <!-- Filtered Image Preview -->
-        <div class="frame-preview">
-          <img src="/filtered/{output_filename}" alt="Filtered Image Preview">
-          <small>Here’s your image with the Tarjimly frame</small>
-        </div>
-
-        <!-- Download button instead of Apply Filter -->
-        <a href="/filtered/{output_filename}" download>
-          <button type="button" class="download-btn">Download Filtered Image</button>
-        </a>
+          <!-- Filtered Image Preview -->
+          <div class="frame-preview">
+            <img src="/filtered/{output_filename}" alt="Filtered Image Preview">
+            <small>Here’s your image with the Tarjimly frame</small>
+          </div>
+        
+          <!-- Download and Go Back buttons -->
+          <div style="display: flex; justify-content: center; gap: 10px;">
+            <a href="/">
+              <button type="button" class="btn">Go Back to Form</button>
+            </a>
+            <a href="/filtered/{output_filename}" download>
+              <button type="button"  class="btn">Download Image</button>
+            </a>
+          </div>
       </form>
 
     </body>
